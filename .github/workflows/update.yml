@@ -1,0 +1,106 @@
+name: Update CLIs
+
+# Weekly auto-update for every tool under pkgs/. The tool list is discovered
+# from the directory tree, and each tool is bumped by its own `update-<tool>`
+# app — adding a pkgs/<tool>/ needs no edit here. Each bump is gated by that
+# tool's flake checks: a bump that breaks a build or a check fails the job and
+# no PR is opened.
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      tools: ${{ steps.list.outputs.tools }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        # JSON array of pkgs/* directory names, e.g. ["aspire","playwright","sentry"].
+        run: |
+          tools=$(find pkgs -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | jq -R . | jq -cs .)
+          echo "Discovered tools: $tools"
+          echo "tools=$tools" >> "$GITHUB_OUTPUT"
+
+  update:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tool: ${{ fromJSON(needs.discover.outputs.tools) }}
+    concurrency:
+      group: update-${{ matrix.tool }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v30
+
+      - name: Run updater
+        run: nix run "$GITHUB_WORKSPACE#update-${{ matrix.tool }}"
+
+      - name: Summarize changes
+        run: |
+          {
+            echo "### ${{ matrix.tool }}"
+            echo
+            if git diff --quiet -- "pkgs/${{ matrix.tool }}/versions.nix"; then
+              echo "Already up to date."
+            else
+              echo '```diff'
+              git diff -- "pkgs/${{ matrix.tool }}/versions.nix"
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Gate: build only this tool's checks against the dirty working tree (the
+      # just-bumped versions.nix) before opening a PR. A failure aborts the job,
+      # so create-pull-request below never runs. Scoped to the tool so a bump
+      # doesn't rebuild every other tool's checks.
+      - name: Gate on this tool's flake checks
+        run: |
+          system=$(nix eval --raw --impure --expr builtins.currentSystem)
+          mapfile -t checks < <(
+            nix eval --json --apply builtins.attrNames ".#checks.$system" \
+              | jq -r '.[]' | grep "^${{ matrix.tool }}-" || true
+          )
+          if [ "${#checks[@]}" -eq 0 ]; then
+            echo "::warning::No checks for ${{ matrix.tool }} — nothing to gate on."
+            exit 0
+          fi
+          attrs=()
+          for c in "${checks[@]}"; do attrs+=(".#checks.$system.$c"); done
+          printf 'Gating on:%s\n' "$(printf ' %s' "${attrs[@]}")"
+          nix build -L --no-link "${attrs[@]}"
+
+      # Commit scope is the tool's declared package name (lib.packageNames),
+      # not the directory name — e.g. `aspire` -> `aspire-cli`.
+      - name: Resolve package name
+        id: pkg
+        run: echo "name=$(nix eval --raw ".#lib.packageNames.${{ matrix.tool }}")" >> "$GITHUB_OUTPUT"
+
+      - name: Create pull request
+        id: cpr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          add-paths: pkgs/${{ matrix.tool }}/versions.nix
+          branch: auto-update-${{ matrix.tool }}
+          delete-branch: true
+          commit-message: "chore(${{ steps.pkg.outputs.name }}): update CLI"
+          title: "chore(${{ steps.pkg.outputs.name }}): update CLI"
+          body: |
+            Automated weekly version bump for `${{ matrix.tool }}`.
+            See the workflow run summary for the `versions.nix` diff.
+
+      - name: Enable auto-merge
+        if: steps.cpr.outputs.pull-request-number
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge --auto --squash "${{ steps.cpr.outputs.pull-request-number }}"
