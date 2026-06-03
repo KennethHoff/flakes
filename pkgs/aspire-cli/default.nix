@@ -57,15 +57,15 @@ let
 in
 {
   packages = {
-    # `nix build .#aspire-cli` builds stable; the channels hang off it as
-    # sub-attrs, so `.#aspire-cli.stable` / `.staging` / `.dev` build a
-    # specific one. (aspire-cli is the stable derivation carrying its siblings.)
-    aspire-cli = stable // {
-      inherit stable staging dev;
-    };
+    # `aspire-cli` is the stable channel; staging/dev are flat,
+    # underscore-suffixed packages. (A merged `stable // { stable; … }` would
+    # leak the sibling derivations onto a consumer's devShell PATH.)
+    aspire-cli = stable;
+    aspire-cli_staging = staging;
+    aspire-cli_dev = dev;
   };
 
-  # `nix run .#aspire-cli` (and `.#aspire-cli.staging` / `.dev`) resolves the
+  # `nix run .#aspire-cli` (or `.#aspire-cli_staging` / `_dev`) resolves the
   # package and runs its meta.mainProgram — no run-app needed. The root flake
   # turns the `update` spec below into the `update-aspire-cli` app (adds git +
   # a cd into this dir, so it works from anywhere in the repo).

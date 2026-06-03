@@ -7,7 +7,7 @@ pkgs.runCommand "aspire-cli-staging-runtime-path-test"
       pkgs.coreutils
       pkgs.gnugrep
     ];
-    staging = packages.aspire-cli.staging;
+    staging = packages.aspire-cli_staging;
   }
   ''
     set -euo pipefail

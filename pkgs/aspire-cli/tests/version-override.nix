@@ -6,9 +6,9 @@ pkgs.runCommand "aspire-cli-version-override-test"
       pkgs.coreutils
       pkgs.gnugrep
     ];
-    baseUrl = packages.aspire-cli.stable.src.url;
+    baseUrl = packages.aspire-cli.src.url;
     overriddenUrl =
-      (packages.aspire-cli.stable.override {
+      (packages.aspire-cli.override {
         version = "0.0.0-test";
         hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
       }).src.url;

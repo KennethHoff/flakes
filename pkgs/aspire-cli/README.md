@@ -15,16 +15,15 @@ This is a Nix Flake for the [Aspire](https://aspire.dev) CLI tool.
 Run directly from GitHub without cloning:
 
 ```bash
-nix run github:kennethhoff/flakes#aspire-cli          # stable (default)
-nix run github:kennethhoff/flakes#aspire-cli.stable
-nix run github:kennethhoff/flakes#aspire-cli.staging
-nix run github:kennethhoff/flakes#aspire-cli.dev
+nix run github:kennethhoff/flakes#aspire-cli            # stable
+nix run github:kennethhoff/flakes#aspire-cli_staging
+nix run github:kennethhoff/flakes#aspire-cli_dev
 ```
 
 Run from this repo:
 
 ```bash
-nix run .#aspire-cli          # or .#aspire-cli.staging, .#aspire-cli.dev
+nix run .#aspire-cli          # or .#aspire-cli_staging, .#aspire-cli_dev
 ```
 
 Build the package:
@@ -56,7 +55,7 @@ Add this flake as an input and include the package in your dev shell.
     devShells.${system}.default = pkgs.mkShell {
       packages = [
         flakes.packages.${system}.aspire-cli
-        # stable; or pick a channel: aspire-cli.staging, aspire-cli.dev
+        # stable; or pick a channel: aspire-cli_staging, aspire-cli_dev
       ];
     };
   };

@@ -12,9 +12,9 @@ pkgs.runCommand "aspire-cli-version-test"
       pkgs.coreutils
       pkgs.gnugrep
     ];
-    stable = packages.aspire-cli.stable;
-    staging = packages.aspire-cli.staging;
-    dev = packages.aspire-cli.dev;
+    stable = packages.aspire-cli;
+    staging = packages.aspire-cli_staging;
+    dev = packages.aspire-cli_dev;
     stableVersion = versions.stable.fileVersion;
     stagingVersion = versions.staging.fileVersion;
     devVersion = versions.dev.fileVersion;
