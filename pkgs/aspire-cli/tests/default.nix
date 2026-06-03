@@ -1,0 +1,12 @@
+# Aggregates the per-check files in this directory. The root flake namespaces
+# each key as `aspire-<key>`.
+{ pkgs, self }:
+let
+  packages = self.packages.${pkgs.stdenv.hostPlatform.system};
+  args = { inherit pkgs packages; };
+in
+{
+  version = import ./version.nix args;
+  versionOverride = import ./version-override.nix args;
+  stagingBundleRuntimePath = import ./staging-bundle-runtime-path.nix args;
+}
