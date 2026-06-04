@@ -5,6 +5,11 @@ set -euo pipefail
 # and python on PATH; invoking this script directly requires those tools.
 
 LATEST=$(curl -s "https://api.github.com/repos/mitchdenny/hex1b/releases/latest" | jq -r '.tag_name')
+if [[ -z "${LATEST}" || "${LATEST}" == "null" ]]; then
+  echo "failed to resolve latest release tag from GitHub API" >&2
+  exit 1
+fi
+
 VERSION="${LATEST#v}"
 URL="https://github.com/mitchdenny/hex1b/archive/refs/tags/${LATEST}.tar.gz"
 
