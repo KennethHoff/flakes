@@ -1,0 +1,167 @@
+[
+  {
+    "pname": "ExCSS",
+    "version": "4.2.3",
+    "hash": "sha512-/LBtBJN6a9hkBg6L30pllwx0UM290yeUZYUTEKyL8StkXKxUzot6gDnHypMJuj2e5OI4J1mUecQUD3dV4RnKqQ=="
+  },
+  {
+    "pname": "HarfBuzzSharp",
+    "version": "7.3.0.2",
+    "hash": "sha512-liiusEJWPOFkCnmiV3r49uPAvQprbeiaUwpEsh/6ferPJWyG02giEZmBHsf28YaDODu/6OvgfOQjbb3aIpwlcg=="
+  },
+  {
+    "pname": "HarfBuzzSharp.NativeAssets.Win32",
+    "version": "7.3.0.2",
+    "hash": "sha512-iMeYCGHf491Q4eRzD6FSujc4be8RXtKu4qhZwr+fM8lhLXUJgsCTy54JiTBH0PW9IBaPg5FKCcMR67XFs3E2zQ=="
+  },
+  {
+    "pname": "HarfBuzzSharp.NativeAssets.macOS",
+    "version": "7.3.0.2",
+    "hash": "sha512-ipdBDNKPJhP2fOqSNtbykhFl5WRPzlo/zQXKEbZw/FlrpLQihxrQeSz1lXLqbwWuaAKMsQmD8VR7Tt/oHK7LGg=="
+  },
+  {
+    "pname": "MSTest.Analyzers",
+    "version": "4.2.3",
+    "hash": "sha512-oMl3Q/NTg+Sh6HzHjRJPBXBKChaNCy1KK4y+XG7MhhWD2Rm8BwAjrS9ZdiNAlFeaebSZ2FeYVj/DzYIskLsiTw=="
+  },
+  {
+    "pname": "MSTest.TestAdapter",
+    "version": "4.2.3",
+    "hash": "sha512-+iEzsBw3vrt8bftsqZdfxq1ccOv3m88mLoT7mW8w5adZv/astkb1WtUWaH9sR8iaUuGzPkvMEOTU6hi7RHyqKA=="
+  },
+  {
+    "pname": "MSTest.TestFramework",
+    "version": "4.2.3",
+    "hash": "sha512-0fLQ8lkX7JliRCanSAMaKgKRpNd19nWYIfFtfMrX0RlU8kft2KhFtgbGxjaj63gYX78lkUotavYmSkghaJSXSw=="
+  },
+  {
+    "pname": "Microsoft.ApplicationInsights",
+    "version": "2.23.0",
+    "hash": "sha512-3Ul7+tDGXlSk940qFkTz0IVNTNAd2DulBvjV1TY14oFSx8EyEN1d05hXgKqxRqdiDePrrq2O8SxvhwiGdsIVfw=="
+  },
+  {
+    "pname": "Microsoft.DiaSymReader",
+    "version": "2.2.3",
+    "hash": "sha512-FJeHfh17tc9JMcLM1VpRMfg6wnEcPQjFAQR8TA3Ep/0xlg6nI5mNR5f+DVbN7DcJy/UTEGGKMrJKDf/0wgYZCQ=="
+  },
+  {
+    "pname": "Microsoft.Extensions.DependencyInjection.Abstractions",
+    "version": "8.0.2",
+    "hash": "sha512-uhlg7xEKxzh6Kgbu/ALFnOV7D+WLPgzMt5scjyFQEFxdH0tl4O2V/1DXDygUKRfGpzW4P05UBrsdj53R+WNdfQ=="
+  },
+  {
+    "pname": "Microsoft.Extensions.DependencyModel",
+    "version": "8.0.2",
+    "hash": "sha512-QqnlTFG1+ZodJq55ziGsy1IYpgCyU0YyqiwqTNysXSlC0pdvLJFf6FI+xeOQBDYHrGsKUw3p58u62eGEHs6jfg=="
+  },
+  {
+    "pname": "Microsoft.Extensions.Logging.Abstractions",
+    "version": "8.0.3",
+    "hash": "sha512-5onsHiy50vr6n9n2q4YaCJWqmhy8n7N+ndhWyNFwkATrFFXmRXC1EBO+iLYOmuDET4+FOTLZzeqzPdtC/OwZmw=="
+  },
+  {
+    "pname": "Microsoft.TestPlatform.ObjectModel",
+    "version": "18.3.0",
+    "hash": "sha512-uolEzXwrH4qQGGbANgrHm1E9w+uChlsYrgPsx2FsbYj9NXcyFxZH51HF7igtS1tJlISFDp34o7ZaOOGq60o7uA=="
+  },
+  {
+    "pname": "Microsoft.Testing.Extensions.CodeCoverage",
+    "version": "18.5.2",
+    "hash": "sha512-OfH9nv3qI3Frry2SIrZgUqXpb5cxApLPOqkRgpq+BEZvIP8PiT1iTWy8XLVLZI4GdZo9cZXKCKJAKRgH9LbVVA=="
+  },
+  {
+    "pname": "Microsoft.Testing.Extensions.Telemetry",
+    "version": "2.2.3",
+    "hash": "sha512-sAd+CJq8NqYHPwFJKnbBM2VdcREehl4yexfg6T3xMZxxzFFlY1iokFinqhcOP3uu5twEAD9/wwm8UOUC3/Oimg=="
+  },
+  {
+    "pname": "Microsoft.Testing.Extensions.TrxReport",
+    "version": "2.2.3",
+    "hash": "sha512-TMVB2y2f62JNX8EfVupibbV77aX2Hfnn67pkbHU9A98IZ+qIplo/CZZHwINXnNU67zoxENcFIWJSyu6xQLdHJw=="
+  },
+  {
+    "pname": "Microsoft.Testing.Extensions.TrxReport.Abstractions",
+    "version": "2.2.3",
+    "hash": "sha512-fOzee+Rzh1GPiQkRDkAal/sD7eHaxFmfZY3zqWr9YzLvQZpPa2aVkTtq2uJ+VMWN8X78jAaTnyRpmhFNIEn24A=="
+  },
+  {
+    "pname": "Microsoft.Testing.Extensions.VSTestBridge",
+    "version": "2.2.3",
+    "hash": "sha512-hn+iZLQkLBs0XM3777qd2A6sBRCjAtpDrf7GGpPrH1rSlNK291hd3o3uruk+p+D52BeP0hxs9SzSzMQEgqZpWA=="
+  },
+  {
+    "pname": "Microsoft.Testing.Platform",
+    "version": "2.2.3",
+    "hash": "sha512-23HrlYHmBA1tkVCE4VPpWkCu9Izt94agkMrGpfemppm5029F0vMKOHwNEgjl15KCUkrYGhg2EJ5gRpNENrXWpw=="
+  },
+  {
+    "pname": "Microsoft.Testing.Platform.MSBuild",
+    "version": "2.2.3",
+    "hash": "sha512-/8Qr9HnMt/Cg4eq0jWuibrjUaRszN3Hbm70mi43XuQiRwQgczngl5lBC+oh48QG7ZwnE8pIJ1JgTzjgOxVuBGQ=="
+  },
+  {
+    "pname": "Microsoft.Win32.SystemEvents",
+    "version": "6.0.0",
+    "hash": "sha512-XidKzplsPrpjCZ7VEW+dw59p9oT3wediPCjDxzmIt1xn38ySmlCnYfAiLfJD3VQHIKbliOkd+nhPgb/Oeok4dQ=="
+  },
+  {
+    "pname": "QRCoder",
+    "version": "1.7.0",
+    "hash": "sha512-UjlFQnuvDPkz9jCgTY858aLNsVUMCSurfhxxvEjKgP8RicE7gRZ/xLuMK+qvCoBEN580EKgjuGUITIlSGEXnqA=="
+  },
+  {
+    "pname": "ShimSkiaSharp",
+    "version": "2.0.0.4",
+    "hash": "sha512-/R6je+aFuQJBZPItyiUyOFG0y7VhzuIipv3dPrulF0xn83r097pdJ5Qu9Q8ungzbZo6oxgb8Q3dFrcxvj8oP0w=="
+  },
+  {
+    "pname": "SkiaSharp",
+    "version": "3.116.1",
+    "hash": "sha512-NWrWrAQ3+cHVUcnsHehXHqp9AMxKekORHfcyyitJedjxYCMWq9jSTz6gDdNlmYyHMvS9fnM6030zE1cSfbxfHg=="
+  },
+  {
+    "pname": "SkiaSharp.HarfBuzz",
+    "version": "2.88.8",
+    "hash": "sha512-hChvqnzA66etBbPo/PjszrnEfsaeYotYb9omn0xjvJ5b4W8DtpP5PmQqj9un4ujMwJPYoh9VAOCS8GJpUjLNNw=="
+  },
+  {
+    "pname": "SkiaSharp.NativeAssets.Linux.NoDependencies",
+    "version": "3.116.1",
+    "hash": "sha512-/wMtdjJc265BzG1uESoztI945oGTDB36LoofuCM060Roe8k7CRCVLlgajZZ0GkX6ZV3cL2rJIC5tfegYi0Swzg=="
+  },
+  {
+    "pname": "SkiaSharp.NativeAssets.Win32",
+    "version": "3.116.1",
+    "hash": "sha512-QNJcR/m9D6inJ7UFemC/v99vgekzR/H/aD95D9gQOCl5XJE8h8/Mx1oYRNVICUsOZp43hHo6iWUs21JzKosmpQ=="
+  },
+  {
+    "pname": "SkiaSharp.NativeAssets.macOS",
+    "version": "3.116.1",
+    "hash": "sha512-3luo75+sp2nB2sGgFsrkZnsPfKBQlCX+q5pEEYBNR9HzK8ueO+90zvQ2i5lF6mi8S6/d8eqSXQQrStSc4mfpaw=="
+  },
+  {
+    "pname": "Svg.Custom",
+    "version": "2.0.0.4",
+    "hash": "sha512-9DLWZZcJ9LNuH1UV4hZjHQ0wpCCqJMJ9h6MRAfdnnq5DdgWaaJrJVAdU3cC8mjrB1FYUfNCVuX3SvrMpxRGVAQ=="
+  },
+  {
+    "pname": "Svg.Model",
+    "version": "2.0.0.4",
+    "hash": "sha512-86ysKsR+fjwd98Ao7IQkI4zF+wjFU9/3m3XleiOz1AgGOBgwoCUtWKtd5MaDmGjNAnVYilaSdE43SndkXs+gvA=="
+  },
+  {
+    "pname": "Svg.Skia",
+    "version": "2.0.0.4",
+    "hash": "sha512-EoxJXnwzIUOCMQUGuMaMM1XXaGlxNlF2Z9nSLyxy15ahRB9gSgW06naKHz5Qucv1daWwWhAypZJUyB9Z0xzmdQ=="
+  },
+  {
+    "pname": "System.CommandLine",
+    "version": "2.0.2",
+    "hash": "sha512-iMwOcOXmgEDbZc1to9fnuNBqwh4x46npp0SlohI6VoqK6nP8wIvDz6SbDkT2N7JNKJiafewTxKOhW26HhA//ug=="
+  },
+  {
+    "pname": "System.Drawing.Common",
+    "version": "6.0.0",
+    "hash": "sha512-1h8KPgHD6sFfE/wboEosfOTqyVZACy+qNh/sq9ODbUnVvTRPOYXuPZTNw/anK44H5CPNspZbT1yiIitd4ymI5A=="
+  }
+]

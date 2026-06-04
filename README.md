@@ -10,6 +10,7 @@ needs an extra pinned input).
 | Package | Tool | Directory |
 | --- | --- | --- |
 | `aspire-cli` (+ `aspire-cli_staging`/`aspire-cli_dev`) | [Aspire CLI](https://aspire.dev) | [`pkgs/aspire-cli`](pkgs/aspire-cli) |
+| `hex1b` | [Hex1b CLI](https://github.com/mitchdenny/hex1b) | [`pkgs/hex1b`](pkgs/hex1b) |
 | `playwright-cli` | [Playwright CLI](https://playwright.dev) | [`pkgs/playwright-cli`](pkgs/playwright-cli) |
 | `sentry-cli` | [Sentry CLI](https://cli.sentry.dev) | [`pkgs/sentry-cli`](pkgs/sentry-cli) |
 
@@ -24,6 +25,7 @@ runs its `meta.mainProgram`. aspire's non-stable channels are separate packages
 ```bash
 # Run a CLI without cloning:
 nix run github:kennethhoff/flakes#aspire-cli          # stable; or #aspire-cli_staging / _dev
+nix run github:kennethhoff/flakes#hex1b
 nix run github:kennethhoff/flakes#playwright-cli
 nix run github:kennethhoff/flakes#sentry-cli
 
