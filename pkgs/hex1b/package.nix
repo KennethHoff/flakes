@@ -34,7 +34,7 @@ buildDotnetModule {
   '';
 
   meta = {
-    description = "Hex1b CLI tool for terminal management and diagnostics";
+    description = "hex1b tool for terminal management and diagnostics";
     homepage = "https://hex1b.dev";
     license = lib.licenses.mit;
     platforms = dotnetCorePackages.sdk_10_0.meta.platforms;

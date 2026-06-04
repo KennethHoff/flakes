@@ -1,6 +1,6 @@
-# Hex1b CLI
+# hex1b
 
-This package builds the [Hex1b](https://github.com/mitchdenny/hex1b) CLI (`hex1b`) from source using .NET.
+This package builds [hex1b](https://github.com/mitchdenny/hex1b) (`hex1b`) from source using .NET.
 
 ## Usage
 
