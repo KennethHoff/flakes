@@ -10,6 +10,7 @@ needs an extra pinned input).
 | Package | Tool | Directory |
 | --- | --- | --- |
 | `aspire-cli` (+ `aspire-cli_staging`/`aspire-cli_dev`) | [Aspire CLI](https://aspire.dev) | [`pkgs/aspire-cli`](pkgs/aspire-cli) |
+| `cve-lite-cli` | [OWASP CVE Lite CLI](https://github.com/OWASP/cve-lite-cli) | [`pkgs/cve-lite-cli`](pkgs/cve-lite-cli) |
 | `playwright-cli` | [Playwright CLI](https://playwright.dev) | [`pkgs/playwright-cli`](pkgs/playwright-cli) |
 | `sentry-cli` | [Sentry CLI](https://cli.sentry.dev) | [`pkgs/sentry-cli`](pkgs/sentry-cli) |
 
