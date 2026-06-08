@@ -93,8 +93,15 @@ jobs:
             Automated weekly version bump for `${{ matrix.tool }}`.
             See the workflow run summary for the `versions.nix` diff.
 
-      - name: Enable auto-merge
+      - name: Merge PR
         if: steps.cpr.outputs.pull-request-number
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --auto --squash "${{ steps.cpr.outputs.pull-request-number }}"
+          PR: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          # No required checks gate the PR, so it goes straight to a mergeable
+          # ("clean") state and `--auto` is rejected with "clean status". Try
+          # auto-merge first (covers the brief window where mergeability is still
+          # being computed), then fall back to an immediate squash-merge.
+          gh pr merge --auto --squash --delete-branch "$PR" \
+            || gh pr merge --squash --delete-branch "$PR"
