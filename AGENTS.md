@@ -1,5 +1,13 @@
 # Agents Guide
 
+## Nix gotchas
+
+Nix can only see files staged to Git, so if you create new files, make sure to add the file to Git:
+
+<staging-code>
+  git add --intent-to-add {name_of_file}
+</staging-code>
+
 ## Repository shape
 
 Monorepo of Nix flakes. One package per `pkgs/<name>/` directory; the root
