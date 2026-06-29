@@ -33,14 +33,14 @@ Common types:
 - `style` – formatting, whitespace
 
 When a change is scoped to one tool, use its **directory name** as the scope —
-which is the package name, e.g. `aspire-cli`. The auto-update workflow uses the
+which is the package name, e.g. `sentry-cli`. The auto-update workflow uses the
 same scope.
 
 Examples:
 ```
 feat(playwright-cli): add support for all major Nix platforms
-fix(aspire-cli): pin openssl 3.6.1 for DCP TLS handshake
-chore(sentry-cli): update CLI to 0.35.0
+fix(sentry-cli): pin openssl 3.6.1 for DCP TLS handshake
+chore(cve-lite-cli): update CLI to 0.8.2
 docs: document the add-a-package contract
 ci: matrix the weekly auto-update workflow over all tools
 ```

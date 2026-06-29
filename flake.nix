@@ -4,10 +4,8 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    # Consumed only by pkgs/aspire-cli (OpenSSL 3.6.1 pin — see its default.nix).
     # Inputs must live at the flake root, so a tool needing an extra pinned
     # input adds a line here; ordinary tools need nothing but nixpkgs.
-    nixpkgs-openssl.url = "github:NixOS/nixpkgs/549bd84d6279f9852cae6225e372cc67fb91a4c1";
   };
 
   outputs =
@@ -77,7 +75,7 @@
       };
     in
     {
-      # Flat, globally-unique names (aspire-cli, sentry-cli, playwright-cli, …).
+      # Flat, globally-unique names (sentry-cli, playwright-cli, …).
       # No `default` — a multi-tool repo has no single obvious default; name the
       # package or app explicitly.
       packages = forAllSystems (system: mergeField system "packages" id);
@@ -101,7 +99,7 @@
         lib.foldl' (acc: name: acc // appsFor name) { } toolNames
       );
 
-      # Namespaced per tool (aspire-readme, sentry-smoke, …) to avoid collisions.
+      # Namespaced per tool (cve-lite-readme, sentry-smoke, …) to avoid collisions.
       checks = forAllSystems (
         system:
         mergeField system "checks" (

@@ -9,22 +9,19 @@ needs an extra pinned input).
 
 | Package | Tool | Directory |
 | --- | --- | --- |
-| `aspire-cli` (+ `aspire-cli_staging`/`aspire-cli_dev`) | [Aspire CLI](https://aspire.dev) | [`pkgs/aspire-cli`](pkgs/aspire-cli) |
 | `cve-lite-cli` | [OWASP CVE Lite CLI](https://github.com/OWASP/cve-lite-cli) | [`pkgs/cve-lite-cli`](pkgs/cve-lite-cli) |
 | `playwright-cli` | [Playwright CLI](https://playwright.dev) | [`pkgs/playwright-cli`](pkgs/playwright-cli) |
 | `sentry-cli` | [Sentry CLI](https://cli.sentry.dev) | [`pkgs/sentry-cli`](pkgs/sentry-cli) |
 
 There is **no** `default` package or app — a multi-tool repo has no single
-obvious default, so name the output explicitly (`#aspire-cli`, `#sentry-cli`, …).
+obvious default, so name the output explicitly (`#sentry-cli`, …).
 The CLIs have no dedicated run-app: `nix run .#<name>` resolves the package and
-runs its `meta.mainProgram`. aspire's non-stable channels are separate packages
-(`aspire-cli_staging`, `aspire-cli_dev`); `aspire-cli` itself is stable.
+runs its `meta.mainProgram`.
 
 ## Usage
 
 ```bash
 # Run a CLI without cloning:
-nix run github:kennethhoff/flakes#aspire-cli          # stable; or #aspire-cli_staging / _dev
 nix run github:kennethhoff/flakes#playwright-cli
 nix run github:kennethhoff/flakes#sentry-cli
 
@@ -80,16 +77,14 @@ README (linked in the table above).
    The **directory name is the canonical name**: `pkgs/<name>/` gives package
    `<name>`, the `update-<name>` app, checks `<name>-*`, and the Conventional
    Commit scope the workflow uses — so name the dir after the package
-   (`aspire-cli`, `sentry-cli`, …). Channels/variants are separate flat packages
-   (`aspire-cli_staging`), each runnable via its own mainProgram. Avoid merging
+   (`sentry-cli`, …). Avoid merging
    derivations (`a // { b = …; }`) into one package — the sibling derivations
    leak onto consumers' devShell PATH.
 
 That's it. The root flake folds the new tool into `packages`/`apps`/`checks`/
 `devShells`, and the weekly update workflow auto-discovers it via its
 `update-<name>` app. The only reason to touch the root `flake.nix` is when a
-tool needs an extra **flake input** (Nix requires inputs at the root) — see the
-`nixpkgs-openssl` pin that `pkgs/aspire-cli` consumes.
+tool needs an extra **flake input** (Nix requires inputs at the root).
 
 ### Conventions a tool must follow
 
@@ -121,7 +116,6 @@ opening one auto-merging PR per tool when a new upstream version lands.
 
 - **One `flake.lock`.** `nix flake update` bumps `nixpkgs` for every tool at
   once; a tool's nixpkgs can't be pinned independently. Fine for personal use.
-- **`nixpkgs-openssl` pin.** Temporary OpenSSL 3.6.1 pin for the Aspire CLI;
-  carries a `TODO(~2026-07)` to revisit — see `pkgs/aspire-cli/default.nix`.
+
 - **Old per-tool repos stay live.** This migration is additive; existing
   consumers pinned to `github:kennethhoff/<tool>-cli-flake` keep working.
