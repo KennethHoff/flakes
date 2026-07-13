@@ -1,28 +1,28 @@
 {
-  version = "0.1.15";
-  srcHash = "sha256-M0NZ7h1kSIsxktMWe5n75LDc+MHZvSq6b+iRx6opakU=";
-  npmDepsHash = "sha256-ZrO8yIqMYMQUlsQraejVgKRZ7klC5/8UsV3/H1EqYtA=";
+  version = "0.1.17";
+  srcHash = "sha256-tc/2Qck3mm6BqWTu2lvvfsM0/BHO/Z0ZvCdFZ7QQqKI=";
+  npmDepsHash = "sha256-u44jWprmr3RdzB3aDL3K0ShT5lLxr175z3C8pN43YFA=";
 
   # Chromium revision + Chrome for Testing browserVersion shipped with this
   # playwright-cli release (read from playwright-core/browsers.json).
-  chromiumRevision = "1229";
-  chromiumBrowserVersion = "150.0.7871.24";
+  chromiumRevision = "1232";
+  chromiumBrowserVersion = "151.0.7922.10";
 
   # Per-platform sha256 of the chrome + chrome-headless-shell zips from
   # https://cdn.playwright.dev/builds/cft/<chromiumBrowserVersion>/<platform>/
   # linux-arm64 is not published by Chrome for Testing upstream.
   chromiumHashes = {
     x86_64-linux = {
-      chromium = "sha256-4N1XIa6H/HQyKzcOdPgVwUY1fr5Crxdvju4/eIsuwB0=";
-      headless = "sha256-b52s85PZnDEVqIp73emRZ6ksmFbL0cIYfKds1HHVoto=";
+      chromium = "sha256-JztIc0wJuxcd/mfwdmwMIzPyOU2hPb5EBQN3vxhn2aI=";
+      headless = "sha256-2QjHDANW3XReibTXiG4yW7PbbtGWMzyv4TDFo1NhIEo=";
     };
     x86_64-darwin = {
-      chromium = "sha256-/wE9IpjB/fAZ5sxNOMn22f5F6g6HyJFALcEvIbAuqFk=";
-      headless = "sha256-dsaBSsLtAs6DHoJuORRKldjq0cl7M2mrTQYsraXxr/A=";
+      chromium = "sha256-8xGh6TMdPnUER9wkJOI4kYyK5WE2v0WNCxftCghotjo=";
+      headless = "sha256-3vydyxjkIf2+a0oTsFXKXw4sq2LlVvK2gBtVm64iK38=";
     };
     aarch64-darwin = {
-      chromium = "sha256-HQybKGfMML6te9RGjspVC/gmBSZ5xfe/+RrVJ6p1f8s=";
-      headless = "sha256-3AxBmHvpJnc9ueEuZSELBPrEbe98LtpMTrF1oMRpHmo=";
+      chromium = "sha256-Nm7nfVxs0/xi+n+NjW8+o61jYIANnasnoegeIhEJRhQ=";
+      headless = "sha256-HsryUs7B1AdxM9v3684g4LuacWZAEmUA8AsfeMraNMM=";
     };
   };
 
