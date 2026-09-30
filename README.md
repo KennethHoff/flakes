@@ -1,9 +1,9 @@
 # flakes
 
-A monorepo of personal Nix flakes. Each packaged CLI lives in its own
-`pkgs/<name>/` directory; the root `flake.nix` auto-discovers them, so adding a
-new package is "drop a directory" — no edits to the root flake (unless the tool
-needs an extra pinned input).
+Personal Nix flakes in one repo. Each CLI lives in its own `pkgs/<name>/`
+directory, and the root `flake.nix` finds them on its own. Adding a package
+means adding a directory. The root flake only changes when a tool needs an
+extra flake input.
 
 ## Packages
 
@@ -12,11 +12,11 @@ needs an extra pinned input).
 | `cve-lite-cli` | [OWASP CVE Lite CLI](https://github.com/OWASP/cve-lite-cli) | [`pkgs/cve-lite-cli`](pkgs/cve-lite-cli) |
 | `playwright-cli` | [Playwright CLI](https://playwright.dev) | [`pkgs/playwright-cli`](pkgs/playwright-cli) |
 | `sentry-cli` | [Sentry CLI](https://cli.sentry.dev) | [`pkgs/sentry-cli`](pkgs/sentry-cli) |
+| `twg-cli` | [Atlassian Teamwork Graph CLI](https://developer.atlassian.com/cloud/twg-cli/) | [`pkgs/twg-cli`](pkgs/twg-cli) |
 
-There is **no** `default` package or app — a multi-tool repo has no single
-obvious default, so name the output explicitly (`#sentry-cli`, …).
-The CLIs have no dedicated run-app: `nix run .#<name>` resolves the package and
-runs its `meta.mainProgram`.
+There is no `default` package or app, so always name the output, as in
+`#sentry-cli`. `nix run .#<name>` runs the package's `meta.mainProgram`, so no
+tool needs its own run app.
 
 ## Usage
 
@@ -24,6 +24,7 @@ runs its `meta.mainProgram`.
 # Run a CLI without cloning:
 nix run github:kennethhoff/flakes#playwright-cli
 nix run github:kennethhoff/flakes#sentry-cli
+nix run github:kennethhoff/flakes#twg-cli
 
 # Build a package:
 nix build github:kennethhoff/flakes#sentry-cli
@@ -32,7 +33,7 @@ nix build github:kennethhoff/flakes#sentry-cli
 nix develop github:kennethhoff/flakes
 ```
 
-Consume in your own flake:
+To use a package from another flake:
 
 ```nix
 {
@@ -42,21 +43,24 @@ Consume in your own flake:
     pkgs = nixpkgs.legacyPackages.${system};
   in {
     devShells.${system}.default = pkgs.mkShell {
-      packages = [ flakes.packages.${system}.sentry-cli ];
+      packages = [
+        flakes.packages.${system}.sentry-cli
+        flakes.packages.${system}.twg-cli
+      ];
     };
   };
 }
 ```
 
-Per-package usage, version-override, and platform notes live in each tool's
-README (linked in the table above).
+Each tool's README, linked from the table, covers its usage, version
+overrides, and platform notes.
 
 ## Adding a package
 
-1. Create `pkgs/<name>/` (named after the package) and add the packaging files
-   (`package.nix`, `versions.nix`, `update.sh`, `README.md`, optional `tests/`).
-2. Add `pkgs/<name>/default.nix` returning the tool-module contract — every key
-   is optional:
+1. Create `pkgs/<name>/` with the packaging files: `package.nix`,
+   `versions.nix`, `update.sh`, `README.md`, and optionally `tests/`.
+2. Add `pkgs/<name>/default.nix`. It returns an attribute set, and every key is
+   optional:
 
    ```nix
    { inputs, system, self, lib }:
@@ -74,48 +78,42 @@ README (linked in the table above).
    }
    ```
 
-   The **directory name is the canonical name**: `pkgs/<name>/` gives package
-   `<name>`, the `update-<name>` app, checks `<name>-*`, and the Conventional
-   Commit scope the workflow uses — so name the dir after the package
-   (`sentry-cli`, …). Avoid merging
-   derivations (`a // { b = …; }`) into one package — the sibling derivations
-   leak onto consumers' devShell PATH.
+The root flake adds the new tool to `packages`, `apps`, `checks`, and
+`devShells`. The weekly update workflow picks it up through its `update-<name>`
+app.
 
-That's it. The root flake folds the new tool into `packages`/`apps`/`checks`/
-`devShells`, and the weekly update workflow auto-discovers it via its
-`update-<name>` app. The only reason to touch the root `flake.nix` is when a
-tool needs an extra **flake input** (Nix requires inputs at the root).
+### Rules every tool follows
 
-### Conventions a tool must follow
-
-- **Dir name = package name** — name `pkgs/<name>/` after its package. That name
-  is the output name, the `update-<name>` app, the `<name>-*` check prefix, and
-  the Conventional Commit scope the workflow uses.
-- **`meta.mainProgram`** — set it on each package so `nix run .#<name>` works
-  without a dedicated run-app.
-- **`update` spec** — declare `{ runtimeInputs; script; }` and the root builds
-  the `update-<dir>` app: it adds `git`, cd's into the tool's dir (resolved from
-  the repo root), then runs the script — so `nix run .#update-<dir>` works from
-  anywhere. `update.sh` just writes `versions.nix` to the current directory.
-- **Namespaced checks** — `tests/default.nix` returns bare keys; the root
-  prefixes them with `<name>-`.
+- **The directory name is the package name.** `pkgs/<name>/` produces the
+  package `<name>`, the `update-<name>` app, and checks named `<name>-*`. It is
+  also the Conventional Commit scope the update workflow uses.
+- **Set `meta.mainProgram` on each package.** Without it, `nix run .#<name>`
+  doesn't know which binary to start.
+- **Declare an `update` spec** of `{ runtimeInputs; script; }`. The root wraps
+  it as the `update-<name>` app, which adds `git` and changes into the tool's
+  directory before running the script. `update.sh` only has to write
+  `versions.nix` to the current directory, and the app works from anywhere in
+  the repo.
+- **Return bare check names** from `tests/default.nix`. The root adds the
+  `<name>-` prefix.
+- **Keep one derivation per package.** Merging derivations, as in
+  `a // { b = …; }`, puts the extra derivations on consumers' dev shell PATH.
 
 ## Updating versions
 
-Each tool ships an `update-<name>` app that bumps its `versions.nix`. Run it
-from anywhere in the repo:
+Each tool's `update-<name>` app bumps its `versions.nix`:
 
 ```bash
 nix run .#update-sentry-cli
 ```
 
-The `.github/workflows/update.yml` matrix runs every tool's updater weekly,
-opening one auto-merging PR per tool when a new upstream version lands.
+Every week, `.github/workflows/update.yml` runs each tool's updater. When a new
+upstream version lands, it opens one auto-merging PR for that tool.
 
 ## Caveats
 
-- **One `flake.lock`.** `nix flake update` bumps `nixpkgs` for every tool at
-  once; a tool's nixpkgs can't be pinned independently. Fine for personal use.
-
-- **Old per-tool repos stay live.** This migration is additive; existing
-  consumers pinned to `github:kennethhoff/<tool>-cli-flake` keep working.
+- **There is one `flake.lock`.** `nix flake update` bumps `nixpkgs` for every
+  tool at once, and no tool can pin its own nixpkgs. That's fine for personal
+  use.
+- **The old per-tool repos still work.** Consumers pinned to
+  `github:kennethhoff/<tool>-cli-flake` don't need to move.
