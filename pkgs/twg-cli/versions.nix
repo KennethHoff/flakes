@@ -1,11 +1,11 @@
 {
-  version = "1.3.5";
+  version = "1.3.8";
 
   # From https://teamwork-graph.atlassian.com/cli/SHA256SUMS-v<version>, converted to SRI.
   hashes = {
-    x86_64-linux = "sha256-1m2TIg9EDwBiecZocnTtTJJINdpOwgXMgYvBf23ZHAg=";
-    aarch64-linux = "sha256-sib25S+BN6KjViwXLTqLYIpyu7kHivhFw2GEaOoRcPA=";
-    x86_64-darwin = "sha256-EefShuuyc07C9EUrQrE3VMXrZbL7qor+nIoGyx6doIo=";
-    aarch64-darwin = "sha256-vI2eB7qSdcLf/tpVXzAYKHgsSXKpOH3CIf480+njMJg=";
+    x86_64-linux = "sha256-yfWfgOpj3sSpG3QnF2UK+XYp9Xc81jrul7xMq9IRc2E=";
+    aarch64-linux = "sha256-TSxnq168L7g/yC229ojR6Ya6RFJCeKik1EL710egG/o=";
+    x86_64-darwin = "sha256-x5eXxzRSCje3SZNVj6medpI7Qtu9+g7puZ4Ko3d2Rjg=";
+    aarch64-darwin = "sha256-EC94ZcmNlOrQ/3mb3VVsodXngkDUpDG9Z+Dzbcy0USQ=";
   };
 }
