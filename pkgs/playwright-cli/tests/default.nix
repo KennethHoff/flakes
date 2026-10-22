@@ -7,8 +7,9 @@ let
 in
 {
   version = import ./version.nix args;
-  browser-opens = import ./browser-opens.nix args;
 }
+# Only where a browser is bundled; aarch64-linux has none.
 // pkgs.lib.optionalAttrs (packages.playwright-cli ? chromiumHeadlessShell) {
+  browser-opens = import ./browser-opens.nix args;
   headless-shell = import ./headless-shell.nix args;
 }

@@ -89,10 +89,10 @@ let
       # Chrome for Testing links against the FHS loader (/lib64/ld-linux-*),
       # which a NixOS host only has through nix-ld and a build sandbox never.
       nativeBuildInputs = [
-        makeWrapper
         unzip
       ]
-      ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ];
+      ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ]
+      ++ lib.optionals (mainProgram != null) [ makeWrapper ];
       buildInputs = browserDeps;
       dontUnpack = true;
       installPhase = ''
