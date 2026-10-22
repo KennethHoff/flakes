@@ -7,4 +7,8 @@ let
 in
 {
   version = import ./version.nix args;
+  browser-opens = import ./browser-opens.nix args;
+}
+// pkgs.lib.optionalAttrs (packages.playwright-cli ? chromiumHeadlessShell) {
+  headless-shell = import ./headless-shell.nix args;
 }

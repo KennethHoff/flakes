@@ -1,9 +1,11 @@
 {
   lib,
+  autoPatchelfHook,
   buildNpmPackage,
   fetchFromGitHub,
   fetchurl,
   makeWrapper,
+  runCommand,
   stdenvNoCC,
   symlinkJoin,
   unzip,
@@ -84,7 +86,10 @@ let
         url = "https://cdn.playwright.dev/builds/cft/${chromiumBrowserVersion}/${cftPlatform}/${zipName}-${cftPlatform}.zip";
         inherit hash;
       };
-      nativeBuildInputs = [ unzip ];
+      # Chrome for Testing links against the FHS loader (/lib64/ld-linux-*),
+      # which a NixOS host only has through nix-ld and a build sandbox never.
+      nativeBuildInputs = [ unzip ] ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ];
+      buildInputs = browserDeps;
       dontUnpack = true;
       installPhase = ''
         runHook preInstall
@@ -171,6 +176,25 @@ let
     libxrandr
     libxcb
   ];
+
+  # The bundled headless shell, runnable outside `playwright-cli`, for a
+  # Playwright client (another language binding, another version) to launch via
+  # its executablePath; such a client looks for its own revision's directory, so
+  # PLAYWRIGHT_BROWSERS_PATH alone doesn't reach this bundle.
+  chromiumHeadlessShell = lib.optionalAttrs (browsersDir ? out) {
+    out =
+      runCommand "chrome-headless-shell-${chromiumBrowserVersion}"
+        {
+          nativeBuildInputs = [ makeWrapper ];
+          meta.mainProgram = "chrome-headless-shell";
+        }
+        ''
+          makeWrapper \
+            ${browsersDir.out}/chromium_headless_shell-${chromiumRevision}/chrome-headless-shell-${cftPlatform}/chrome-headless-shell \
+            $out/bin/chrome-headless-shell \
+            ${lib.optionalString stdenv.isLinux ''--prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath browserDeps}"''}
+        '';
+  };
 in
 buildNpmPackage {
   pname = "playwright-cli";
@@ -215,6 +239,10 @@ buildNpmPackage {
     wrapProgram $out/bin/playwright-cli \
       --set-default PLAYWRIGHT_BROWSERS_PATH ${browsersDir.out}
   '';
+
+  passthru = lib.optionalAttrs (chromiumHeadlessShell ? out) {
+    chromiumHeadlessShell = chromiumHeadlessShell.out;
+  };
 
   meta = {
     description = "Playwright CLI";
