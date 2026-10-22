@@ -5,7 +5,6 @@
   fetchFromGitHub,
   fetchurl,
   makeWrapper,
-  runCommand,
   stdenvNoCC,
   symlinkJoin,
   unzip,
@@ -78,6 +77,7 @@ let
       zipName,
       dirName,
       hash,
+      mainProgram ? null,
     }:
     stdenvNoCC.mkDerivation {
       pname = "playwright-${dirName}";
@@ -97,8 +97,15 @@ let
         unzip -q "$src" -d "$out/${dirName}-${chromiumRevision}"
         touch "$out/${dirName}-${chromiumRevision}/INSTALLATION_COMPLETE"
         touch "$out/${dirName}-${chromiumRevision}/DEPENDENCIES_VALIDATED"
+      ''
+      + lib.optionalString (mainProgram != null) ''
+        mkdir -p "$out/bin"
+        ln -s "../${dirName}-${chromiumRevision}/${zipName}-${cftPlatform}/${mainProgram}" "$out/bin/${mainProgram}"
+      ''
+      + ''
         runHook postInstall
       '';
+      meta = lib.optionalAttrs (mainProgram != null) { inherit mainProgram; };
     };
 
   # Build the ffmpeg dir matching Playwright's expected on-disk layout:
@@ -123,6 +130,16 @@ let
     '';
   };
 
+  # Also exposed on its own, for a Playwright client (another language binding,
+  # another version) to launch via executablePath; such a client looks for its
+  # own revision's directory, so PLAYWRIGHT_BROWSERS_PATH alone doesn't reach it.
+  chromiumHeadlessShell = mkBrowser {
+    zipName = "chrome-headless-shell";
+    dirName = "chromium_headless_shell";
+    hash = hostHashes.headless;
+    mainProgram = "chrome-headless-shell";
+  };
+
   browsersDir =
     lib.optionalAttrs
       (cftPlatform != null && hostHashes != null && ffmpegPlatform != null && ffmpegHostHash != null)
@@ -135,11 +152,7 @@ let
               dirName = "chromium";
               hash = hostHashes.chromium;
             })
-            (mkBrowser {
-              zipName = "chrome-headless-shell";
-              dirName = "chromium_headless_shell";
-              hash = hostHashes.headless;
-            })
+            chromiumHeadlessShell
             ffmpegDir
           ];
         };
@@ -177,24 +190,6 @@ let
     libxcb
   ];
 
-  # The bundled headless shell, runnable outside `playwright-cli`, for a
-  # Playwright client (another language binding, another version) to launch via
-  # its executablePath; such a client looks for its own revision's directory, so
-  # PLAYWRIGHT_BROWSERS_PATH alone doesn't reach this bundle.
-  chromiumHeadlessShell = lib.optionalAttrs (browsersDir ? out) {
-    out =
-      runCommand "chrome-headless-shell-${chromiumBrowserVersion}"
-        {
-          nativeBuildInputs = [ makeWrapper ];
-          meta.mainProgram = "chrome-headless-shell";
-        }
-        ''
-          makeWrapper \
-            ${browsersDir.out}/chromium_headless_shell-${chromiumRevision}/chrome-headless-shell-${cftPlatform}/chrome-headless-shell \
-            $out/bin/chrome-headless-shell \
-            ${lib.optionalString stdenv.isLinux ''--prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath browserDeps}"''}
-        '';
-  };
 in
 buildNpmPackage {
   pname = "playwright-cli";
@@ -240,8 +235,8 @@ buildNpmPackage {
       --set-default PLAYWRIGHT_BROWSERS_PATH ${browsersDir.out}
   '';
 
-  passthru = lib.optionalAttrs (chromiumHeadlessShell ? out) {
-    chromiumHeadlessShell = chromiumHeadlessShell.out;
+  passthru = lib.optionalAttrs (browsersDir ? out) {
+    inherit chromiumHeadlessShell;
   };
 
   meta = {
