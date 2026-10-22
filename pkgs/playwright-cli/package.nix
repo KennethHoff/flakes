@@ -88,7 +88,11 @@ let
       };
       # Chrome for Testing links against the FHS loader (/lib64/ld-linux-*),
       # which a NixOS host only has through nix-ld and a build sandbox never.
-      nativeBuildInputs = [ unzip ] ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ];
+      nativeBuildInputs = [
+        makeWrapper
+        unzip
+      ]
+      ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ];
       buildInputs = browserDeps;
       dontUnpack = true;
       installPhase = ''
@@ -98,9 +102,13 @@ let
         touch "$out/${dirName}-${chromiumRevision}/INSTALLATION_COMPLETE"
         touch "$out/${dirName}-${chromiumRevision}/DEPENDENCIES_VALIDATED"
       ''
+      # LD_LIBRARY_PATH outranks the patched RUNPATH, so a caller's own (say, a
+      # libasound built against a newer glibc) would otherwise be loaded first.
       + lib.optionalString (mainProgram != null) ''
-        mkdir -p "$out/bin"
-        ln -s "../${dirName}-${chromiumRevision}/${zipName}-${cftPlatform}/${mainProgram}" "$out/bin/${mainProgram}"
+        makeWrapper \
+          "$out/${dirName}-${chromiumRevision}/${zipName}-${cftPlatform}/${mainProgram}" \
+          "$out/bin/${mainProgram}" \
+          ${lib.optionalString stdenv.isLinux ''--prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath browserDeps}"''}
       ''
       + ''
         runHook postInstall
