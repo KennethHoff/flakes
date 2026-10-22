@@ -66,6 +66,21 @@ Add this flake as an input and include the package in your dev shell.
 
 Then run `nix develop` and use `playwright-cli`.
 
+### Reuse the browser from another Playwright client
+
+The bundled Chromium headless shell is exposed as
+`playwright-cli.chromiumHeadlessShell`, runnable on its own (no nix-ld or FHS
+environment needed). A Playwright client of another language or version looks
+for its own browser revision, so point it at the binary instead:
+
+```nix
+env.CHROMIUM_HEADLESS_SHELL = pkgs.lib.getExe flakes.packages.${system}.playwright-cli.chromiumHeadlessShell;
+```
+
+and launch with `executablePath` (`ExecutablePath` in .NET) set to that value.
+Only on systems with a bundled browser: `x86_64-linux`, `x86_64-darwin` and
+`aarch64-darwin`.
+
 ## Supported platforms
 
 - `x86_64-linux`

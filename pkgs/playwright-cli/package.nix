@@ -1,5 +1,6 @@
 {
   lib,
+  autoPatchelfHook,
   buildNpmPackage,
   fetchFromGitHub,
   fetchurl,
@@ -76,6 +77,7 @@ let
       zipName,
       dirName,
       hash,
+      mainProgram ? null,
     }:
     stdenvNoCC.mkDerivation {
       pname = "playwright-${dirName}";
@@ -84,7 +86,14 @@ let
         url = "https://cdn.playwright.dev/builds/cft/${chromiumBrowserVersion}/${cftPlatform}/${zipName}-${cftPlatform}.zip";
         inherit hash;
       };
-      nativeBuildInputs = [ unzip ];
+      # Chrome for Testing links against the FHS loader (/lib64/ld-linux-*),
+      # which a NixOS host only has through nix-ld and a build sandbox never.
+      nativeBuildInputs = [
+        unzip
+      ]
+      ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ]
+      ++ lib.optionals (mainProgram != null) [ makeWrapper ];
+      buildInputs = browserDeps;
       dontUnpack = true;
       installPhase = ''
         runHook preInstall
@@ -92,8 +101,19 @@ let
         unzip -q "$src" -d "$out/${dirName}-${chromiumRevision}"
         touch "$out/${dirName}-${chromiumRevision}/INSTALLATION_COMPLETE"
         touch "$out/${dirName}-${chromiumRevision}/DEPENDENCIES_VALIDATED"
+      ''
+      # LD_LIBRARY_PATH outranks the patched RUNPATH, so a caller's own (say, a
+      # libasound built against a newer glibc) would otherwise be loaded first.
+      + lib.optionalString (mainProgram != null) ''
+        makeWrapper \
+          "$out/${dirName}-${chromiumRevision}/${zipName}-${cftPlatform}/${mainProgram}" \
+          "$out/bin/${mainProgram}" \
+          ${lib.optionalString stdenv.isLinux ''--prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath browserDeps}"''}
+      ''
+      + ''
         runHook postInstall
       '';
+      meta = lib.optionalAttrs (mainProgram != null) { inherit mainProgram; };
     };
 
   # Build the ffmpeg dir matching Playwright's expected on-disk layout:
@@ -118,6 +138,16 @@ let
     '';
   };
 
+  # Also exposed on its own, for a Playwright client (another language binding,
+  # another version) to launch via executablePath; such a client looks for its
+  # own revision's directory, so PLAYWRIGHT_BROWSERS_PATH alone doesn't reach it.
+  chromiumHeadlessShell = mkBrowser {
+    zipName = "chrome-headless-shell";
+    dirName = "chromium_headless_shell";
+    hash = hostHashes.headless;
+    mainProgram = "chrome-headless-shell";
+  };
+
   browsersDir =
     lib.optionalAttrs
       (cftPlatform != null && hostHashes != null && ffmpegPlatform != null && ffmpegHostHash != null)
@@ -130,11 +160,7 @@ let
               dirName = "chromium";
               hash = hostHashes.chromium;
             })
-            (mkBrowser {
-              zipName = "chrome-headless-shell";
-              dirName = "chromium_headless_shell";
-              hash = hostHashes.headless;
-            })
+            chromiumHeadlessShell
             ffmpegDir
           ];
         };
@@ -171,6 +197,7 @@ let
     libxrandr
     libxcb
   ];
+
 in
 buildNpmPackage {
   pname = "playwright-cli";
@@ -215,6 +242,10 @@ buildNpmPackage {
     wrapProgram $out/bin/playwright-cli \
       --set-default PLAYWRIGHT_BROWSERS_PATH ${browsersDir.out}
   '';
+
+  passthru = lib.optionalAttrs (browsersDir ? out) {
+    inherit chromiumHeadlessShell;
+  };
 
   meta = {
     description = "Playwright CLI";
