@@ -23,7 +23,9 @@ stdenv.mkDerivation {
 
   src = fetchurl {
     url = "https://teamwork-graph.atlassian.com/cli/twg-${platform}-v${version}";
-    hash = hashes.${stdenv.hostPlatform.system} or (throw "twg-cli: no hash for ${stdenv.hostPlatform.system}");
+    hash =
+      hashes.${stdenv.hostPlatform.system}
+        or (throw "twg-cli: no hash for ${stdenv.hostPlatform.system}");
   };
 
   dontUnpack = true;
@@ -34,12 +36,12 @@ stdenv.mkDerivation {
   dontStrip = true;
   dontPatchELF = true;
 
-  nativeBuildInputs = lib.optionals stdenv.isLinux [ patchelf ];
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ patchelf ];
 
   installPhase = ''
     runHook preInstall
     install -Dm755 $src $out/bin/twg
-    ${lib.optionalString stdenv.isLinux ''
+    ${lib.optionalString stdenv.hostPlatform.isLinux ''
       patchelf --set-interpreter "${stdenv.cc.bintools.dynamicLinker}" $out/bin/twg
     ''}
     runHook postInstall

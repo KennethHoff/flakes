@@ -91,7 +91,7 @@ let
       nativeBuildInputs = [
         unzip
       ]
-      ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ]
+      ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ]
       ++ lib.optionals (mainProgram != null) [ makeWrapper ];
       buildInputs = browserDeps;
       dontUnpack = true;
@@ -108,7 +108,7 @@ let
         makeWrapper \
           "$out/${dirName}-${chromiumRevision}/${zipName}-${cftPlatform}/${mainProgram}" \
           "$out/bin/${mainProgram}" \
-          ${lib.optionalString stdenv.isLinux ''--prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath browserDeps}"''}
+          ${lib.optionalString stdenv.hostPlatform.isLinux ''--prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath browserDeps}"''}
       ''
       + ''
         runHook postInstall
@@ -168,7 +168,7 @@ let
 
   # Native shared libs Chromium/WebKit dlopen at runtime when launched via
   # `playwright-cli`. Linux only; Darwin browsers come self-contained.
-  browserDeps = lib.optionals stdenv.isLinux [
+  browserDeps = lib.optionals stdenv.hostPlatform.isLinux [
     alsa-lib
     at-spi2-atk
     at-spi2-core
@@ -231,14 +231,14 @@ buildNpmPackage {
       --replace-fail 'browser.launchOptions.channel = "chrome"' \
                      'browser.launchOptions.channel = "chromium"'
   ''
-  + lib.optionalString stdenv.isLinux ''
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
     wrapProgram $out/bin/playwright-cli \
       ${
         lib.optionalString (browsersDir ? out) "--set-default PLAYWRIGHT_BROWSERS_PATH ${browsersDir.out}"
       } \
       --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath browserDeps}"
   ''
-  + lib.optionalString (stdenv.isDarwin && browsersDir ? out) ''
+  + lib.optionalString (stdenv.hostPlatform.isDarwin && browsersDir ? out) ''
     wrapProgram $out/bin/playwright-cli \
       --set-default PLAYWRIGHT_BROWSERS_PATH ${browsersDir.out}
   '';
