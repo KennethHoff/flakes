@@ -6,7 +6,7 @@
   fetchurl,
   makeWrapper,
   stdenvNoCC,
-  symlinkJoin,
+  runCommand,
   unzip,
   stdenv,
   alsa-lib,
@@ -152,18 +152,24 @@ let
     lib.optionalAttrs
       (cftPlatform != null && hostHashes != null && ffmpegPlatform != null && ffmpegHostHash != null)
       {
-        out = symlinkJoin {
-          name = "playwright-browsers-cft-${chromiumBrowserVersion}";
-          paths = [
-            (mkBrowser {
+        # One symlink per <name>-<revision> directory rather than a recursive
+        # merge: Chrome's macOS helper processes crash when the .app bundle is
+        # itself made of symlinks.
+        out =
+          let
+            chromium = mkBrowser {
               zipName = "chrome";
               dirName = "chromium";
               hash = hostHashes.chromium;
-            })
-            chromiumHeadlessShell
-            ffmpegDir
-          ];
-        };
+            };
+          in
+          runCommand "playwright-browsers-cft-${chromiumBrowserVersion}" { } ''
+            mkdir "$out"
+            ln -s ${chromium}/chromium-${chromiumRevision} "$out/chromium-${chromiumRevision}"
+            ln -s ${chromiumHeadlessShell}/chromium_headless_shell-${chromiumRevision} \
+              "$out/chromium_headless_shell-${chromiumRevision}"
+            ln -s ${ffmpegDir}/ffmpeg-${ffmpegRevision} "$out/ffmpeg-${ffmpegRevision}"
+          '';
       };
 
   # Native shared libs Chromium/WebKit dlopen at runtime when launched via
