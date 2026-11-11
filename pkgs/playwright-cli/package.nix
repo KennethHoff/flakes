@@ -6,7 +6,7 @@
   fetchurl,
   makeWrapper,
   stdenvNoCC,
-  symlinkJoin,
+  runCommand,
   unzip,
   stdenv,
   alsa-lib,
@@ -91,7 +91,7 @@ let
       nativeBuildInputs = [
         unzip
       ]
-      ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ]
+      ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ]
       ++ lib.optionals (mainProgram != null) [ makeWrapper ];
       buildInputs = browserDeps;
       dontUnpack = true;
@@ -108,7 +108,7 @@ let
         makeWrapper \
           "$out/${dirName}-${chromiumRevision}/${zipName}-${cftPlatform}/${mainProgram}" \
           "$out/bin/${mainProgram}" \
-          ${lib.optionalString stdenv.isLinux ''--prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath browserDeps}"''}
+          ${lib.optionalString stdenv.hostPlatform.isLinux ''--prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath browserDeps}"''}
       ''
       + ''
         runHook postInstall
@@ -152,23 +152,29 @@ let
     lib.optionalAttrs
       (cftPlatform != null && hostHashes != null && ffmpegPlatform != null && ffmpegHostHash != null)
       {
-        out = symlinkJoin {
-          name = "playwright-browsers-cft-${chromiumBrowserVersion}";
-          paths = [
-            (mkBrowser {
+        # One symlink per <name>-<revision> directory rather than a recursive
+        # merge: Chrome's macOS helper processes crash when the .app bundle is
+        # itself made of symlinks.
+        out =
+          let
+            chromium = mkBrowser {
               zipName = "chrome";
               dirName = "chromium";
               hash = hostHashes.chromium;
-            })
-            chromiumHeadlessShell
-            ffmpegDir
-          ];
-        };
+            };
+          in
+          runCommand "playwright-browsers-cft-${chromiumBrowserVersion}" { } ''
+            mkdir "$out"
+            ln -s ${chromium}/chromium-${chromiumRevision} "$out/chromium-${chromiumRevision}"
+            ln -s ${chromiumHeadlessShell}/chromium_headless_shell-${chromiumRevision} \
+              "$out/chromium_headless_shell-${chromiumRevision}"
+            ln -s ${ffmpegDir}/ffmpeg-${ffmpegRevision} "$out/ffmpeg-${ffmpegRevision}"
+          '';
       };
 
   # Native shared libs Chromium/WebKit dlopen at runtime when launched via
   # `playwright-cli`. Linux only; Darwin browsers come self-contained.
-  browserDeps = lib.optionals stdenv.isLinux [
+  browserDeps = lib.optionals stdenv.hostPlatform.isLinux [
     alsa-lib
     at-spi2-atk
     at-spi2-core
@@ -231,14 +237,14 @@ buildNpmPackage {
       --replace-fail 'browser.launchOptions.channel = "chrome"' \
                      'browser.launchOptions.channel = "chromium"'
   ''
-  + lib.optionalString stdenv.isLinux ''
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
     wrapProgram $out/bin/playwright-cli \
       ${
         lib.optionalString (browsersDir ? out) "--set-default PLAYWRIGHT_BROWSERS_PATH ${browsersDir.out}"
       } \
       --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath browserDeps}"
   ''
-  + lib.optionalString (stdenv.isDarwin && browsersDir ? out) ''
+  + lib.optionalString (stdenv.hostPlatform.isDarwin && browsersDir ? out) ''
     wrapProgram $out/bin/playwright-cli \
       --set-default PLAYWRIGHT_BROWSERS_PATH ${browsersDir.out}
   '';
